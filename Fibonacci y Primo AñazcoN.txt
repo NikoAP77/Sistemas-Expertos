@@ -1,0 +1,38 @@
+#SERIE DE FIBONACCI
+
+(deffunction fibonacci(?n) 
+(if ( or (= ?n 0) (= ?n 1))then 
+?n
+else  
+(+ (fibonacci(- ?n 1)) (fibonacci(- ?n 2))))) 
+
+(deffunction serie(?numIni ?numFin)
+(printout t (fibonacci ?numIni) crlf)
+(if (< ?numIni (- ?numFin 1)) then 
+    (serie (+ ?numIni 1) ?numFin)))
+
+
+(printout t (serie 0 8)) 
+
+
+#VALIDAR SI UN NUMERO ES PRIMO 
+
+(deffunction numeroPrimoRecursivo(?numero ?divisor)    
+  (if(< (/ ?numero 2) ?divisor)then 
+    (return TRUE)
+   else 
+     (if (= (mod ?numero ?divisor) 0)then  
+      (return FALSE)   
+     else      
+      (return(numeroPrimoRecursivo ?numero (+ ?divisor 1)))))) 
+
+
+(deffunction numeroPrimo(?numero)  
+(if(numeroPrimoRecursivo ?numero 2) then 
+(printout t "---EL NUMERO ES PRIMO---" crlf) 
+ else 
+(printout t "---EL NUMERO NO ES PRIMO---" crlf))) 
+
+(printout t (numeroPrimo 79)) 
+(printout t (numeroPrimo 80)) 
+
