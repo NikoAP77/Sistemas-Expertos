@@ -1,0 +1,3 @@
+CLIPS> (load "OrdenarNumeros")
+CLIPS> (run)
+CLIPS> (assert (list 2 3 1 10 7))   --Ingresar el numero de numeros que desee 
