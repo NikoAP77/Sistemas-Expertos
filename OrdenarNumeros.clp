@@ -1,25 +1,21 @@
-(deffacts MAIN::numeros
-   (list 18)
-   (list 9)
-   (list 30)
-   (list 6)
-   (list 1)
+(defrule ordenarN
+(list $?x)
+=>
+(assert (listOrder ?x))
 )
 
-(defrule MAIN::ordenarN
-   (list ?x)
-   =>
-   (assert (listOrder ?x)))
+(defrule orden
+?h <- (listOrder $?b ?m1 ?m2&:(< ?m2 ?m1) $?e)
+=>
+(retract ?h)
+(assert (listOrder $?b ?m2 ?m1 $?e))
+)
 
-(defrule MAIN::orden
-   ?h <- (max listOrder ?b ?m1 ?m2&:(< ?m2 ?m1) $?e)
-   =>
-   (retract ?h)
-   (assert (listOrder ?b ?m2 ?m1 $?e)))
-
-(defrule MAIN::final
-   (not (listOrder ?x ?m1 ?m2&:(< ?m2 ?m1) $?e))
-   (list ?y)
-   =>
-   (printout t " - " ?y ))
+(defrule final
+(not (listOrder $?b ?m1 ?m2&:(< ?m2 ?m1) $?e))
+(list $?x)
+(listOrder $?y)
+=>
+(printout t "El ordern de: " ?x " es " ?y crlf)
+)
 
