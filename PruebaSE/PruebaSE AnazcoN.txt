@@ -1,0 +1,45 @@
+Cargar archivo de datos al Neo4j
+
+LOAD CSV FROM "file:///C:/Users/USER/Desktop/PruebaSE/pruebaAnazcoN.csv" as row
+CREATE (p:Persona)
+SET p.class = row[3],
+    p.features = row[4..];
+
+Mark training data 70 %:
+
+MATCH (p:Persona)
+WITH p LIMIT 12605
+SET p:Training;
+
+Mark test data 30%:
+
+MATCH (p:Persona)
+WITH p SKIP 12605
+SET p:Test;
+
+Convertir a vectores:
+
+MATCH (n:Persona)
+UNWIND n.features as feature
+WITH n,collect(CASE feature 
+                          WHEN n.features[0] THEN toInteger(n.features[0])
+                          WHEN n.features[1] THEN toInteger(n.features[1])
+                          WHEN n.features[2] THEN toInteger(n.features[2])
+                          WHEN n.features[3] THEN toInteger(n.features[3])
+                          WHEN n.features[4] THEN toInteger(n.features[4])
+                          END) as feature_vector
+SET n.feature_vector=feature_vector
+
+Consulta:
+
+MATCH (test:Test)
+WITH test,test.feature_vector as feature_vector
+CALL apoc.cypher.run('MATCH (training:Training)
+	WITH training,gds.alpha.similarity.euclideanDistance($feature_vector, training.feature_vector) AS similarity
+    ORDER BY similarity ASC LIMIT 3
+    RETURN collect(training.class) as classes',
+    {feature_vector:feature_vector}) YIELD value
+WITH test.class as class, apoc.coll.sortMaps(apoc.coll.frequencies(value.classes), '^count')[-1].item as predicted_class
+WITH sum(CASE when class = predicted_class THEN 1 ELSE 0 END) as correct_predictions, count(*) as total_predictions
+RETURN correct_predictions,total_predictions, correct_predictions / toFloat(total_predictions) as ratio;
+
